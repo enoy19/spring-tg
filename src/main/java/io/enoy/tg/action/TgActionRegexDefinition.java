@@ -2,7 +2,7 @@ package io.enoy.tg.action;
 
 import org.telegram.telegrambots.api.objects.Message;
 
-public interface TgActionRegexDefinition extends TgActionDefinition {
+public interface TgActionRegexDefinition<T extends TgActionContext> extends TgActionDefinition<T> {
 
 	@Override
 	default boolean accepts(Message message) {

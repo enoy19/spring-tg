@@ -4,7 +4,6 @@ import io.enoy.tg.bot.TgBot;
 import io.enoy.tg.scope.context.TgContext;
 import io.enoy.tg.scope.context.TgContextHolder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.send.SendMessage;

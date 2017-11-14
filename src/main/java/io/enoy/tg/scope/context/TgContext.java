@@ -1,13 +1,13 @@
 package io.enoy.tg.scope.context;
 
-import io.enoy.tg.action.TgAction;
+import io.enoy.tg.action.TgActionContext;
 import org.telegram.telegrambots.api.objects.User;
 
 public class TgContext {
 
 	private User user;
 	private long userId;
-	private TgAction currentAction;
+	private TgActionContext currentActionContext;
 
 	public void setUser(User user) {
 		this.user = user;
@@ -22,16 +22,16 @@ public class TgContext {
 		return userId;
 	}
 
-	public TgAction getCurrentAction() {
-		return currentAction;
+	public TgActionContext getCurrentActionContext() {
+		return currentActionContext;
 	}
 
-	public void setCurrentAction(TgAction currentAction) {
-		this.currentAction = currentAction;
+	public void setCurrentActionContext(TgActionContext currentActionContext) {
+		this.currentActionContext = currentActionContext;
 	}
 
-	public void resetAction() {
-		setCurrentAction(null);
+	public void resetActionContext() {
+		setCurrentActionContext(null);
 	}
 
 	@Override
