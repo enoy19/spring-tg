@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.File;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
@@ -25,15 +27,31 @@ public class TgMessageService {
 
     private final TgBot tgBot;
 
-    public void sendMessage(String message) {
+    public Message sendMessage(String message) {
 
         TgContext context = TgContextHolder.currentContext();
         try {
-            tgBot.execute(new SendMessage(context.getUserId(), message));
+            return tgBot.execute(new SendMessage(context.getUserId(), message));
         } catch (TelegramApiException e) {
             throw new IllegalStateException(e);
         }
 
+    }
+
+    public void editMessage(String messageText, Message message) {
+
+        TgContext context = TgContextHolder.currentContext();
+
+        EditMessageText editMessage = new EditMessageText();
+        editMessage.setChatId(context.getUserId());
+        editMessage.setMessageId(message.getMessageId());
+        editMessage.setText(messageText);
+
+        try {
+            tgBot.execute(editMessage);
+        } catch (TelegramApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public String getRelativeFilePath(PhotoSize photo) {
