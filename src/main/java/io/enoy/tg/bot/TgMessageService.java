@@ -1,4 +1,4 @@
-package io.enoy.tg.action.message;
+package io.enoy.tg.bot;
 
 import io.enoy.tg.bot.TgBot;
 import io.enoy.tg.scope.context.TgContext;
@@ -21,9 +21,6 @@ import java.util.Objects;
 @Scope("tg")
 @RequiredArgsConstructor
 public class TgMessageService {
-
-    @Value("https://api.telegram.org/file/bot${bot.token}/")
-    private String botTokenPath;
 
     private final TgBot tgBot;
 
@@ -54,25 +51,6 @@ public class TgMessageService {
         }
     }
 
-    public String getRelativeFilePath(PhotoSize photo) {
-        Objects.requireNonNull(photo);
 
-        if (photo.hasFilePath()) {
-            return photo.getFilePath();
-        } else {
-            GetFile getFileMethod = new GetFile();
-            getFileMethod.setFileId(photo.getFileId());
-            try {
-                File file = tgBot.execute(getFileMethod);
-                return file.getFilePath();
-            } catch (TelegramApiException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-    }
-
-    public String getFilePath(PhotoSize photo) {
-        return String.format("%s%s", botTokenPath, getRelativeFilePath(photo));
-    }
 
 }

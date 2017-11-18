@@ -2,9 +2,7 @@ package io.enoy.tg.ping;
 
 import io.enoy.tg.action.SimpleTgActionProcessor;
 import io.enoy.tg.action.TgActionContext;
-import io.enoy.tg.action.TgActionProcessor;
-import io.enoy.tg.action.message.TgMessageService;
-import io.enoy.tg.scope.context.TgContextHolder;
+import io.enoy.tg.bot.TgMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
