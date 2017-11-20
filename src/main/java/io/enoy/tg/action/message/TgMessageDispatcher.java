@@ -49,7 +49,7 @@ public class TgMessageDispatcher {
 
     @SuppressWarnings("unchecked")
     private TgActionContext startAction(Message message, TgActionDefinition<?> definition) throws DispatchException {
-        TgActionContext action = definition.createAction(message);
+        TgActionContext action = definition.createContext(message);
         action.setDefinitionClass((Class<? extends TgActionDefinition<?>>) definition.getClass());
         return action;
     }

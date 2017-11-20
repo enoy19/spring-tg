@@ -10,7 +10,7 @@ public interface SimpleTgActionRegexDefinition extends TgActionRegexDefinition<T
     }
 
     @Override
-    default TgActionContext createAction(Message message) {
+    default TgActionContext createContext(Message message) {
         return new TgActionContext();
     }
 }
