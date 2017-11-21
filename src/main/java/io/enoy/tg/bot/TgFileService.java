@@ -25,17 +25,21 @@ public class TgFileService {
 
 	private final TgBot tgBot;
 
+	public java.io.File download(Object object) {
+		return download(object, null);
+	}
+
 	/**
 	 * @param object allowed types: {@link PhotoSize}, {@link Audio},
 	 *               {@link Video}, {@link Document}, {@link Voice}, {@link Sticker}
 	 * @return a temporary file of the downloaded resource
 	 */
-	public java.io.File download(Object object) {
+	public java.io.File download(Object object, String suffix) {
 		String fileId = getFileId(object);
 		String fileUrl = getFileUrl(fileId);
 
 		try {
-			java.io.File file = Files.createTempFile("telegram-spring-", null).toFile();
+			java.io.File file = Files.createTempFile("telegram-spring-", suffix).toFile();
 			saveFile(fileUrl, file);
 			return file;
 		} catch (IOException e) {
