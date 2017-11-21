@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Import(TgExamplesConfiguration.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EnableTgBotPingPong {
+public @interface EnableTgBotExampleControllers {
 }
