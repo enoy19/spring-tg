@@ -13,7 +13,7 @@ import org.telegram.telegrambots.TelegramBotsApi;
 
 @Configuration
 @ComponentScan(value = "io.enoy.tg",
-		excludeFilters = @Filter(type = FilterType.REGEX, pattern = "io\\.enoy\\.tg\\.example\\..*"))
+		excludeFilters = @Filter(type = FilterType.REGEX, pattern = "io\\.enoy\\.tg\\.example\\.*"))
 @RequiredArgsConstructor
 public class TgConfiguration {
 
