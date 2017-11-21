@@ -25,7 +25,7 @@ public class TgMessageDispatcher {
 	private TgAction currentAction;
 	private List<Message> currentMessages = new ArrayList<>();
 
-	public TgRequestResult dispatch(Message message) throws TgDispatchException {
+	public void dispatch(Message message) throws TgDispatchException {
 
 		if (Objects.isNull(currentAction)) {
 			currentAction = resolveAction(message);
@@ -47,7 +47,18 @@ public class TgMessageDispatcher {
 			clear();
 		}
 
-		return result;
+		handleResult(result);
+	}
+
+	private void handleResult(TgRequestResult result) {
+		switch (result) {
+			case RETRY:
+				currentMessages.remove(currentMessages.size() - 1);
+				break;
+			case ABORT:
+				clear();
+				break;
+		}
 	}
 
 	private void clear() {

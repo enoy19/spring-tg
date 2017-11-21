@@ -51,6 +51,7 @@ public enum TgParameterType {
 	}
 
 	public static int getHops(TgParameterType parameterType, Message message) throws NonMatchingTypeException {
+		// TODO: oh nose!
 		Class<?> type = parameterType.getData(message).getClass();
 
 		TgParameterType matchingType = getMatchingParameterType(message);

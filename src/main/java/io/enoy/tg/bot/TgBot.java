@@ -2,6 +2,7 @@ package io.enoy.tg.bot;
 
 import io.enoy.tg.TgMessageDispatcher;
 import io.enoy.tg.TgMessageDispatcher.TgDispatchException;
+import io.enoy.tg.action.request.TgRequestResult;
 import io.enoy.tg.scope.context.TgContext;
 import io.enoy.tg.scope.context.TgContextHolder;
 import lombok.RequiredArgsConstructor;
