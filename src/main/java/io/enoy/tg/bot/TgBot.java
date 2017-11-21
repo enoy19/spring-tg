@@ -1,11 +1,10 @@
 package io.enoy.tg.bot;
 
+import io.enoy.tg.TgMessageDispatcher;
+import io.enoy.tg.TgMessageDispatcher.TgDispatchException;
 import io.enoy.tg.scope.context.TgContext;
 import io.enoy.tg.scope.context.TgContextHolder;
-import io.enoy.tg.action.message.TgMessageDispatcher;
-import io.enoy.tg.action.message.TgMessageDispatcher.DispatchException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -42,14 +41,14 @@ public class TgBot extends TelegramLongPollingBot {
 			TgMessageDispatcher dispatcher = context.getBean(TgMessageDispatcher.class);
 			try {
 				dispatcher.dispatch(message);
-			} catch (DispatchException e) {
+			} catch (TgDispatchException e) {
 				sendDispatchError(tgContext.getUserId(), e);
 			}
 		}
 
 	}
 
-	private void sendDispatchError(long userId, DispatchException e) {
+	private void sendDispatchError(long userId, TgDispatchException e) {
 		try {
 			execute(new SendMessage(userId, String.format("ERROR:%n%s", e.getMessage())));
 		} catch (TelegramApiException e1) {
