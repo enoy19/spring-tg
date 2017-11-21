@@ -5,12 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 
 @Configuration
-@ComponentScan("io.enoy.tg")
+@ComponentScan(value = "io.enoy.tg", excludeFilters = @Filter(pattern = "io.enoy.tg.example"))
 @RequiredArgsConstructor
 public class TgConfiguration {
 
