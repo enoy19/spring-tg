@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class TgContextHolder {
 
-	private static final Map<Integer, TgContext> tgUserContextes = new HashMap<>();
+	private static final Map<Integer, TgContext> tgUserContexts = new HashMap<>();
 	private static final ThreadLocal<TgContext> tgContextThreadLocal = new ThreadLocal<>();
 
 	public static TgContext currentContext() {
@@ -17,13 +17,13 @@ public class TgContextHolder {
 	public static void setupContext(User user) {
 		Integer userId = user.getId();
 
-		if(!tgUserContextes.containsKey(userId)) {
+		if (!tgUserContexts.containsKey(userId)) {
 			TgContext value = new TgContext();
 			value.setUser(user);
-			tgUserContextes.put(userId, value);
+			tgUserContexts.put(userId, value);
 		}
 
-		TgContext tgContext = tgUserContextes.get(userId);
+		TgContext tgContext = tgUserContexts.get(userId);
 
 		tgContextThreadLocal.set(tgContext);
 	}

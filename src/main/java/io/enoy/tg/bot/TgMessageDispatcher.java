@@ -1,4 +1,4 @@
-package io.enoy.tg;
+package io.enoy.tg.bot;
 
 import io.enoy.tg.action.CommandValidator;
 import io.enoy.tg.action.TgAction;
@@ -7,6 +7,7 @@ import io.enoy.tg.action.request.TgParameterType.NonMatchingTypeException;
 import io.enoy.tg.action.request.TgRequestHandlerHopsComposition;
 import io.enoy.tg.action.request.TgRequestResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,13 @@ import java.util.stream.Collectors;
 @Service
 @Scope("tg")
 @RequiredArgsConstructor
+@Slf4j
 public class TgMessageDispatcher {
 
 	private final ApplicationContext context;
 	private final Set<TgAction> actions;
+	private final List<Message> currentMessages = new ArrayList<>();
 	private TgAction currentAction;
-	private List<Message> currentMessages = new ArrayList<>();
 
 	public void dispatch(Message message) throws TgDispatchException {
 
@@ -61,7 +63,7 @@ public class TgMessageDispatcher {
 		}
 	}
 
-	private void clear() {
+	public void clear() {
 		currentMessages.clear();
 		currentAction = null;
 	}
@@ -110,7 +112,9 @@ public class TgMessageDispatcher {
 		int mostHops = requestHandlersWithHops.stream()
 				.mapToInt(TgRequestHandlerHopsComposition::getHops)
 				.max()
-				.getAsInt();
+				.orElseGet(() -> {
+					throw new Error("could not gather maximum hop amount. This should never happen wtf...");
+				});
 
 		for (int i = 0; i <= mostHops; i++) {
 			int finalI = i;
@@ -119,9 +123,9 @@ public class TgMessageDispatcher {
 							.filter(tgRequestHandlerHopsComposition -> tgRequestHandlerHopsComposition.getHops() == finalI)
 							.collect(Collectors.toList());
 
-			if (minHopsHandlers.size() > 1)
+			if (minHopsHandlers.size() > 1) {
 				throw new TgDispatchException("Multiple handlers found!");
-			else if (minHopsHandlers.size() == 1) {
+			} else if (minHopsHandlers.size() == 1) {
 				return minHopsHandlers.get(0).getHandler();
 			}
 		}
@@ -136,12 +140,17 @@ public class TgMessageDispatcher {
 	private TgAction resolveAction(Message message) throws TgDispatchException {
 		List<TgAction> matchingActions = findMatchingActions(message);
 		if (matchingActions.size() > 1) {
+			log.error("Multiple matching commands found: {}", getCommandNamesJoined(matchingActions));
 			throw new TgDispatchException("Multiple matching commands found!");
 		} else if (matchingActions.size() == 0) {
 			throw new TgDispatchException("Command not found");
 		} else {
 			return matchingActions.get(0);
 		}
+	}
+
+	private String getCommandNamesJoined(List<TgAction> matchingActions) {
+		return matchingActions.stream().map(TgAction::getName).collect(Collectors.joining(", "));
 	}
 
 	private List<TgAction> findMatchingActions(final Message message) {

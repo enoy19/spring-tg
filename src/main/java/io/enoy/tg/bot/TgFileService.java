@@ -2,7 +2,6 @@ package io.enoy.tg.bot;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.objects.*;
@@ -28,7 +27,7 @@ public class TgFileService {
 
 	/**
 	 * @param object allowed types: {@link PhotoSize}, {@link Audio},
-	 * {@link Video}, {@link Document}, {@link Voice}, {@link Sticker}
+	 *               {@link Video}, {@link Document}, {@link Voice}, {@link Sticker}
 	 * @return a temporary file of the downloaded resource
 	 */
 	public java.io.File download(Object object) {

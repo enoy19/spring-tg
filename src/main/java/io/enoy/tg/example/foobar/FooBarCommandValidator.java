@@ -9,11 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Component
 public class FooBarCommandValidator implements CommandValidator {
 
-	private AtomicBoolean state = new AtomicBoolean();
+	private final AtomicBoolean state = new AtomicBoolean();
 
 	@Override
 	public boolean validate(Message message) {
-		return state.getAndSet(!state.get());
+		return message.hasText()
+				&& message.getText().trim().equalsIgnoreCase("/foo")
+				&& state.getAndSet(!state.get());
 	}
 
 }

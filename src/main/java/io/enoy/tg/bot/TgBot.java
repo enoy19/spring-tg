@@ -1,11 +1,10 @@
 package io.enoy.tg.bot;
 
-import io.enoy.tg.TgMessageDispatcher;
-import io.enoy.tg.TgMessageDispatcher.TgDispatchException;
-import io.enoy.tg.action.request.TgRequestResult;
+import io.enoy.tg.bot.TgMessageDispatcher.TgDispatchException;
 import io.enoy.tg.scope.context.TgContext;
 import io.enoy.tg.scope.context.TgContextHolder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -15,6 +14,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 @RequiredArgsConstructor
+@Slf4j
 public class TgBot extends TelegramLongPollingBot {
 
 	private final ApplicationContext context;
@@ -43,15 +43,25 @@ public class TgBot extends TelegramLongPollingBot {
 			try {
 				dispatcher.dispatch(message);
 			} catch (TgDispatchException e) {
-				sendDispatchError(tgContext.getUserId(), e);
+				sendPrefixed(tgContext.getUserId(), "ERROR", e.getMessage());
+				dispatcher.clear();
+				log.error(e.getMessage(), e);
+			} catch (Exception e) {
+				sendPrefixed(tgContext.getUserId(), "FATAL ERROR", "Something went wrong :(");
+				dispatcher.clear();
+				log.error(e.getMessage(), e);
 			}
 		}
 
 	}
 
-	private void sendDispatchError(long userId, TgDispatchException e) {
+	private void sendPrefixed(long userId, String prefix, String message) {
+		send(userId, String.format("%s:%n%s", prefix, message));
+	}
+
+	private void send(long userId, String message) {
 		try {
-			execute(new SendMessage(userId, String.format("ERROR:%n%s", e.getMessage())));
+			execute(new SendMessage(userId, message));
 		} catch (TelegramApiException e1) {
 			throw new IllegalStateException(e1);
 		}

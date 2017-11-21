@@ -11,10 +11,10 @@ import java.util.Map;
 
 public class TgScope implements Scope {
 
-	private Map<TgContext, Map<String, Object>> scopedObjects
+	private final Map<TgContext, Map<String, Object>> scopedObjects
 			= Collections.synchronizedMap(new HashMap<TgContext, Map<String, Object>>());
 
-	private Map<TgContext, Map<String, Runnable>> destructionCallbacks
+	private final Map<TgContext, Map<String, Runnable>> destructionCallbacks
 			= Collections.synchronizedMap(new HashMap<TgContext, Map<String, Runnable>>());
 
 	@Override

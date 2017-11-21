@@ -1,9 +1,9 @@
 package io.enoy.tg.action.request;
 
+import io.enoy.tg.action.TgPhotos;
 import org.telegram.telegrambots.api.objects.*;
+import org.telegram.telegrambots.api.objects.stickers.Sticker;
 
-import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -11,10 +11,13 @@ public enum TgParameterType {
 	MESSAGE(null, m -> m, Message.class::isAssignableFrom, m -> true),
 	STRING(MESSAGE, Message::getText, String.class::isAssignableFrom, Message::hasText),
 	DOCUMENT(MESSAGE, Message::getDocument, Document.class::isAssignableFrom, Message::hasDocument),
-	PHOTO(MESSAGE, Message::getPhoto, TgParameterType::isPhotoList, Message::hasPhoto),
+	PHOTO(MESSAGE, TgPhotos::new, TgPhotos.class::isAssignableFrom, Message::hasPhoto),
 	VOICE(MESSAGE, Message::getVoice, Voice.class::isAssignableFrom, m -> Objects.nonNull(m.getVoice())),
+	LOCATION(MESSAGE, Message::getLocation, Location.class::isAssignableFrom, Message::hasLocation),
+	STICKER(MESSAGE, Message::getSticker, Sticker.class::isAssignableFrom, m -> Objects.nonNull(m.getSticker())),
+	VIDEO(MESSAGE, Message::getVideo, Video.class::isAssignableFrom, m -> Objects.nonNull(m.getVideo())),
+	CONTACT(MESSAGE, Message::getContact, Contact.class::isAssignableFrom, m -> Objects.nonNull(m.getContact())),
 	AUDIO(MESSAGE, Message::getAudio, Audio.class::isAssignableFrom, m -> Objects.nonNull(m.getAudio()));
-	// TODO: complete
 
 	private final TgParameterType parent;
 	private final Function<Message, Object> dataFunction;
@@ -53,7 +56,7 @@ public enum TgParameterType {
 	public static int getHops(TgParameterType parameterType, Message message) throws NonMatchingTypeException {
 		Object data = parameterType.getData(message);
 
-		if(Objects.isNull(data))
+		if (Objects.isNull(data))
 			throw new NonMatchingTypeException();
 
 		Class<?> type = data.getClass();
@@ -67,7 +70,7 @@ public enum TgParameterType {
 		for (int i = values.length - 1; i >= 0; i--) {
 			TgParameterType value = values[i];
 			boolean match = value.messageMatchFunction.apply(message);
-			if(match)
+			if (match)
 				return value;
 		}
 
@@ -81,25 +84,6 @@ public enum TgParameterType {
 			}
 		}
 		throw new ParameterTypeException(String.format("Type %s is not defined. Please refer to the values in %s", type.getName(), TgParameterType.class.getName()));
-	}
-
-	private static final boolean isPhotoList(Class<?> clazz) {
-
-		if (List.class.isAssignableFrom(clazz)) {
-			Type[] genericInterfaces = clazz.getGenericInterfaces();
-			if (genericInterfaces.length == 1) {
-				Type type = genericInterfaces[0];
-				try {
-					Class<?> typeClass = Class.forName(type.getTypeName());
-					return PhotoSize.class.isAssignableFrom(typeClass);
-				} catch (ClassNotFoundException e) {
-					// just ignore.
-				}
-			}
-		}
-
-		return false;
-
 	}
 
 	public static class ParameterTypeException extends RuntimeException {

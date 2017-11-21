@@ -1,7 +1,7 @@
 package io.enoy.tg.bot;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TgBotService {
 
 	private final TgBot tgBot;
@@ -20,8 +21,7 @@ public class TgBotService {
 		try {
 			telegramBotsApi.registerBot(tgBot);
 		} catch (TelegramApiRequestException e) {
-			e.printStackTrace();
-			System.exit(1);
+			log.error(String.format("Failed to initialize Telegram Bot: %s", e.getMessage()), e);
 		}
 	}
 

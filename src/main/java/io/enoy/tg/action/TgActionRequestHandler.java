@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.telegram.telegrambots.api.objects.Message;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public final class TgActionRequestHandler {
 		try {
 			Object result = method.invoke(instance, data);
 
-			if(result instanceof TgRequestResult) {
+			if (result instanceof TgRequestResult) {
 				return (TgRequestResult) result;
 			}
 		} catch (ReflectiveOperationException e) {

@@ -6,7 +6,7 @@ import io.enoy.tg.bot.TgMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 
-@TgController(name = "PingPong", description = "Sends back Pong", regex = "\\/pingpong")
+@TgController(name = "PingPong", description = "Sends back Pong", regex = "\\/ping")
 @Scope("tg")
 @RequiredArgsConstructor
 public class PingPong {
