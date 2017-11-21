@@ -13,8 +13,17 @@ import java.lang.annotation.Target;
 public @interface TgController {
 
 	String name();
+
 	String description();
-	String regex() default "";
+
+	/**
+	 * @return the class of the validator of this method. This is processed before using the regex
+	 */
 	Class<? extends CommandValidator> commandValidator() default NoCommandValidator.class;
+
+	/**
+	 * @return if the given message text matches this regex. This controller is a valid candidate. Is only called when commandValidator is NoCommandValidator (default)
+	 */
+	String regex() default "";
 
 }

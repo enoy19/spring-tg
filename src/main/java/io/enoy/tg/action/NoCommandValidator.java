@@ -9,7 +9,7 @@ public final class NoCommandValidator implements CommandValidator {
 	}
 
 	@Override
-	public boolean accepts(Message message) {
+	public boolean validate(Message message) {
 		throw new UnsupportedOperationException();
 	}
 

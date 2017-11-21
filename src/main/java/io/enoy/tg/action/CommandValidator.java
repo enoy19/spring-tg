@@ -5,6 +5,6 @@ import org.telegram.telegrambots.api.objects.Message;
 @FunctionalInterface
 public interface CommandValidator {
 
-	boolean accepts(Message message);
+	boolean validate(Message message);
 
 }

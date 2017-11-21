@@ -1,8 +1,8 @@
 package io.enoy.tg.ping;
 
-import io.enoy.tg.action.TgRequest;
+import io.enoy.tg.action.request.TgRequest;
 import io.enoy.tg.action.TgController;
-import io.enoy.tg.action.TgRequestResult;
+import io.enoy.tg.action.request.TgRequestResult;
 import io.enoy.tg.bot.TgMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -16,9 +16,16 @@ public class PingPong {
 	private final TgMessageService messageService;
 
 	@TgRequest
-	public TgRequestResult pong(Message command) {
+	public void pong(String command) {
+		System.out.println("THIS WAS A STRING ERMAHGERD!");
 		messageService.sendMessage("Pong");
-		return TgRequestResult.OK;
 	}
+
+/*	@TgRequest
+	public void pong(String command, Message message) {
+		System.out.println("THE NEXT MESSAGE");
+		System.out.println(message);
+		messageService.sendMessage("LOL");
+	}*/
 
 }
