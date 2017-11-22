@@ -7,6 +7,13 @@ import org.telegram.telegrambots.api.objects.stickers.Sticker;
 import java.util.Objects;
 import java.util.function.Function;
 
+// TODO: benefits of restructuring this enum concept to extended classes... think about it!
+
+/**
+ * defines the available data in a {@link Message} that can be mapped in {@link TgRequest}s as methods.
+ * @author Enis Ö.
+ * @see TgRequest
+ */
 public enum TgParameterType {
 	MESSAGE(null, m -> m, Message.class::isAssignableFrom, m -> true),
 	STRING(MESSAGE, Message::getText, String.class::isAssignableFrom, Message::hasText),
@@ -17,6 +24,7 @@ public enum TgParameterType {
 	STICKER(MESSAGE, Message::getSticker, Sticker.class::isAssignableFrom, m -> Objects.nonNull(m.getSticker())),
 	VIDEO(MESSAGE, Message::getVideo, Video.class::isAssignableFrom, m -> Objects.nonNull(m.getVideo())),
 	CONTACT(MESSAGE, Message::getContact, Contact.class::isAssignableFrom, m -> Objects.nonNull(m.getContact())),
+	VIDEO_NOTE(MESSAGE, Message::getVideoNote, VideoNote.class::isAssignableFrom, m -> Objects.nonNull(m.getVideoNote())),
 	AUDIO(MESSAGE, Message::getAudio, Audio.class::isAssignableFrom, m -> Objects.nonNull(m.getAudio()));
 
 	private final TgParameterType parent;

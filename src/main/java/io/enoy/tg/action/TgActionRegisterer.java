@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Resolves and registers any {@link TgController} annotated bean in the application context
+ * @author Enis Ö.
+ * @see TgAction
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

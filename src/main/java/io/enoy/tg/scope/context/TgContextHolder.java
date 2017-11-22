@@ -5,6 +5,10 @@ import org.telegram.telegrambots.api.objects.User;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The Telegram context holder. It keeps {@link ThreadLocal} references of all {@link TgContext}s
+ * @author Enis Ö.
+ */
 public class TgContextHolder {
 
 	private static final Map<Integer, TgContext> tgUserContexts = new HashMap<>();
@@ -26,6 +30,10 @@ public class TgContextHolder {
 		TgContext tgContext = tgUserContexts.get(userId);
 
 		tgContextThreadLocal.set(tgContext);
+	}
+
+	public static TgContext getContextOfUserId(Integer userId) {
+		return tgUserContexts.get(userId);
 	}
 
 }

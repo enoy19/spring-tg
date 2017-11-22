@@ -7,6 +7,14 @@ import org.telegram.telegrambots.api.objects.Message;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * a class that unites the data of {@link TgController} and {@link io.enoy.tg.action.request.TgRequest}
+ * and provides some convenient methods.
+ * @author Enis Ö.
+ * @see TgController
+ * @see CommandValidator
+ * @see TgActionRequestHandler
+ */
 @Getter
 @RequiredArgsConstructor
 public final class TgAction {

@@ -16,6 +16,13 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.util.Objects;
 
+/**
+ * Utility service that can automatically determine a file id of a any Telegram bot api entity.
+ * Can also download the files in a temporary folder
+ *
+ * @author Enis Ö.
+ * @see TgMessageService
+ */
 @Service
 @RequiredArgsConstructor
 public class TgFileService {
@@ -25,26 +32,33 @@ public class TgFileService {
 
 	private final TgBot tgBot;
 
-	public java.io.File download(Object object) {
-		return download(object, null);
+	private static String getFileId(Object object) {
+
+		if (object instanceof PhotoSize) {
+			return ((PhotoSize) object).getFileId();
+		} else if (object instanceof Audio) {
+			return ((Audio) object).getFileId();
+		} else if (object instanceof Video) {
+			return ((Video) object).getFileId();
+		} else if (object instanceof VideoNote) {
+			return ((VideoNote) object).getFileId();
+		} else if (object instanceof Document) {
+			return ((Document) object).getFileId();
+		} else if (object instanceof Voice) {
+			return ((Voice) object).getFileId();
+		} else if (object instanceof Sticker) {
+			return ((Sticker) object).getFileId();
+		} else {
+			throw new UnsupportedOperationException(String.format("Object type not supported %s", object.getClass().getName()));
+		}
+
 	}
 
 	/**
-	 * @param object allowed types: {@link PhotoSize}, {@link Audio},
-	 *               {@link Video}, {@link Document}, {@link Voice}, {@link Sticker}
-	 * @return a temporary file of the downloaded resource
+	 * @see #download(Object, String)
 	 */
-	public java.io.File download(Object object, String suffix) {
-		String fileId = getFileId(object);
-		String fileUrl = getFileUrl(fileId);
-
-		try {
-			java.io.File file = Files.createTempFile("telegram-spring-", suffix).toFile();
-			saveFile(fileUrl, file);
-			return file;
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
+	public java.io.File download(Object object) {
+		return download(object, null);
 	}
 
 	public String getFileUrl(String fileId) {
@@ -72,25 +86,24 @@ public class TgFileService {
 		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 	}
 
+	/**
+	 * @param object allowed types: {@link PhotoSize}, {@link Audio},
+	 *               {@link Video}, {@link VideoNote}, {@link Document},
+	 *               {@link Voice}, {@link Sticker}
+	 * @param suffix the file suffix that should be used when naming
+	 * @return a temporary file of the downloaded resource
+	 */
+	public java.io.File download(Object object, String suffix) {
+		String fileId = getFileId(object);
+		String fileUrl = getFileUrl(fileId);
 
-	private static String getFileId(Object object) {
-
-		if (object instanceof PhotoSize) {
-			return ((PhotoSize) object).getFileId();
-		} else if (object instanceof Audio) {
-			return ((Audio) object).getFileId();
-		} else if (object instanceof Video) {
-			return ((Video) object).getFileId();
-		} else if (object instanceof Document) {
-			return ((Document) object).getFileId();
-		} else if (object instanceof Voice) {
-			return ((Voice) object).getFileId();
-		} else if (object instanceof Sticker) {
-			return ((Sticker) object).getFileId();
-		} else {
-			throw new UnsupportedOperationException(String.format("Object type not supported %s", object.getClass().getName()));
+		try {
+			java.io.File file = Files.createTempFile("telegram-spring-", suffix).toFile();
+			saveFile(fileUrl, file);
+			return file;
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
-
 	}
 
 }

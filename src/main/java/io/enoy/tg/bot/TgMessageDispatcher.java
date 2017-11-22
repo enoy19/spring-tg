@@ -16,6 +16,13 @@ import org.telegram.telegrambots.api.objects.Message;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * routes the messages to the right {@link TgAction} instances and calling the right {@link TgActionRequestHandler}s.
+ * @author Enis Ö.
+ * @see TgAction
+ * @see io.enoy.tg.action.request.TgRequest
+ * @see TgActionRequestHandler
+ */
 @Service
 @Scope("tg")
 @RequiredArgsConstructor

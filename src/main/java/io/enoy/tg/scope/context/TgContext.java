@@ -1,7 +1,15 @@
 package io.enoy.tg.scope.context;
 
+import lombok.EqualsAndHashCode;
 import org.telegram.telegrambots.api.objects.User;
 
+/**
+ * The Telegram context. It holds {@link User} information.
+ * @author Enis Ö.
+ * @see TgContextHolder
+ * @see User
+ */
+@EqualsAndHashCode(of = "userId")
 public class TgContext {
 
 	private User user;
@@ -20,18 +28,4 @@ public class TgContext {
 		return userId;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		TgContext tgContext = (TgContext) o;
-
-		return userId == tgContext.userId;
-	}
-
-	@Override
-	public int hashCode() {
-		return (int) (userId ^ (userId >>> 32));
-	}
 }

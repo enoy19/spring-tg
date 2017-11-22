@@ -10,13 +10,24 @@ import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+/**
+ * Telegram message service. Used to send simple text messages to a user.
+ * @author Enis Ö.
+ */
 @Service
 @Scope("tg")
 @RequiredArgsConstructor
 public class TgMessageService {
+	// TODO: create some non-tg-scoped message service that always requires a user id.
+	// TODO: implements every message type that can be sent in tg
 
 	private final TgBot tgBot;
 
+	/**
+	 * Sends a simple text message to the {@link org.telegram.telegrambots.api.objects.User} in the current {@link TgContext}
+	 * @param message
+	 * @return Message that was sent to the user
+	 */
 	public Message sendMessage(String message) {
 
 		TgContext context = TgContextHolder.currentContext();
@@ -28,6 +39,11 @@ public class TgMessageService {
 
 	}
 
+	/**
+	 * Edits the {@link Message} instance to the given text
+	 * @param messageText
+	 * @param message
+	 */
 	public void editMessage(String messageText, Message message) {
 
 		TgContext context = TgContextHolder.currentContext();

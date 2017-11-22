@@ -9,6 +9,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The Telegram Scope. It defines how all beans within this scope are created. This scope uses the {@link TgContext} to map the beans.
+ * @author Enis Ö.
+ * @see TgContextHolder
+ * @see TgContext
+ */
 public class TgScope implements Scope {
 
 	private final Map<TgContext, Map<String, Object>> scopedObjects
@@ -58,6 +64,7 @@ public class TgScope implements Scope {
 		if (!scopedObjects.containsKey(context)) {
 			scopedObjects.put(context, new HashMap<>());
 		}
+
 		return scopedObjects.get(context);
 	}
 
@@ -67,6 +74,7 @@ public class TgScope implements Scope {
 		if (!destructionCallbacks.containsKey(context)) {
 			destructionCallbacks.put(context, new HashMap<>());
 		}
+
 		return destructionCallbacks.get(context);
 	}
 

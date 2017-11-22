@@ -12,6 +12,12 @@ import org.telegram.telegrambots.api.objects.Message;
 import java.lang.reflect.Method;
 import java.util.List;
 
+/**
+ * contains data of {@link io.enoy.tg.action.request.TgRequest}s in {@link TgController}s ({@link TgAction})
+ * @author Enis Ö.
+ * @see TgAction
+ * @see TgActionRegisterer
+ */
 @Getter
 @Setter
 @RequiredArgsConstructor

@@ -13,6 +13,13 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+/**
+ * A {@link TelegramLongPollingBot} that takes care of creating request Threads, setting up the {@link TgContext} as well as forwarding the message to the {@link TgMessageDispatcher}
+ *
+ * @author Enis Ö.
+ * @see TgContext
+ * @see TgMessageDispatcher
+ */
 @RequiredArgsConstructor
 @Slf4j
 public class TgBot extends TelegramLongPollingBot {
@@ -28,31 +35,46 @@ public class TgBot extends TelegramLongPollingBot {
 	@Override
 	public void onUpdateReceived(final Update update) {
 		if (update.hasMessage()) {
-			Thread processThread = new Thread(() -> processUpdate(update.getMessage()));
-			processThread.setDaemon(true);
-			processThread.start();
+			final Message message = update.getMessage();
+
+			Integer senderUserId = message.getFrom().getId();
+			TgContext senderTgContext = TgContextHolder.getContextOfUserId(senderUserId);
+
+			synchronized (senderTgContext) {
+				Thread processThread = new Thread(() -> {
+					TgContextHolder.setupContext(message.getFrom());
+					TgContext tgContext = TgContextHolder.currentContext();
+
+					synchronized (tgContext) {
+						TgMessageDispatcher dispatcher = context.getBean(TgMessageDispatcher.class);
+						try {
+							dispatcher.dispatch(message);
+						} catch (TgDispatchException e) {
+							sendPrefixed(tgContext.getUserId(), "ERROR", e.getMessage());
+							dispatcher.clear();
+							log.error(e.getMessage(), e);
+						} catch (Exception e) {
+							sendPrefixed(tgContext.getUserId(), "FATAL ERROR", "Something went wrong :(");
+							dispatcher.clear();
+							log.error(e.getMessage(), e);
+						}
+					}
+
+				});
+				processThread.setDaemon(true);
+				processThread.start();
+			}
 		}
 	}
 
-	private void processUpdate(Message message) {
-		TgContextHolder.setupContext(message.getFrom());
-		TgContext tgContext = TgContextHolder.currentContext();
+	@Override
+	public String getBotUsername() {
+		return botUsername;
+	}
 
-		synchronized (tgContext) {
-			TgMessageDispatcher dispatcher = context.getBean(TgMessageDispatcher.class);
-			try {
-				dispatcher.dispatch(message);
-			} catch (TgDispatchException e) {
-				sendPrefixed(tgContext.getUserId(), "ERROR", e.getMessage());
-				dispatcher.clear();
-				log.error(e.getMessage(), e);
-			} catch (Exception e) {
-				sendPrefixed(tgContext.getUserId(), "FATAL ERROR", "Something went wrong :(");
-				dispatcher.clear();
-				log.error(e.getMessage(), e);
-			}
-		}
-
+	@Override
+	public String getBotToken() {
+		return botToken;
 	}
 
 	private void sendPrefixed(long userId, String prefix, String message) {
@@ -65,16 +87,6 @@ public class TgBot extends TelegramLongPollingBot {
 		} catch (TelegramApiException e1) {
 			throw new IllegalStateException(e1);
 		}
-	}
-
-	@Override
-	public String getBotUsername() {
-		return botUsername;
-	}
-
-	@Override
-	public String getBotToken() {
-		return botToken;
 	}
 
 }
