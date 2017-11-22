@@ -1,8 +1,10 @@
 # spring-tg
-Create Telegram Bot commands within Spring in a SpringMVC manner.
-This project uses [rubenlagus'](https://github.com/rubenlagus) [Java Telegram Bot API](https://github.com/rubenlagus/TelegramBots).
+Create [Telegram Bot](https://core.telegram.org/bots) commands within [Spring](https://spring.io/) in a SpringMVC manner.
+This project uses [rubenlagus'](https://github.com/rubenlagus) [Java implementation](https://github.com/rubenlagus/TelegramBots) of the [Telegram](https://telegram.org/) [Bot API](https://core.telegram.org/bots/api)
 
-## Examles
+## Examples
+
+For an example spring boot project have a look at: [enoy19/spring-tg-examples](https://github.com/enoy19/spring-tg-examples)
 
 ##### Ping pong example:
 ```java
@@ -172,7 +174,7 @@ public class PingPong {
     }
     
     private void play(org.telegram.telegrambots.api.objects.Audio audio) {
-        ...
+        // play
     }
 
 
@@ -217,11 +219,11 @@ public class PingPong {
     }
     
     private void playAudio(org.telegram.telegrambots.api.objects.Audio audio) {
-        ...
+        // play audio
     }
     
     private void playVoice(org.telegram.telegrambots.api.objects.Voice voice) {
-    	...
+    	// play voice
     }
 
 
@@ -244,7 +246,7 @@ public class SaveImage {
     }
     
     private void savePhoto(org.telegram.telegrambots.api.objects.PhotoSize photo) {
-    	...
+    	// save photo
     }
 
 }
