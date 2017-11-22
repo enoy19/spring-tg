@@ -73,7 +73,7 @@ public class AddAction {
 }
 ```
 
-##### Telegram User Scope: @Scope("tg"")
+##### Telegram User Scope: @Scope("tg")
 ```java
 @TgController(name = "Concatenate", description = "Concatenate a string infinitely", regex = "\\/concat")
 @Scope("tg") // scoped only to one user
