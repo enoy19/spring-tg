@@ -45,11 +45,11 @@ public class TgMessageDispatcher {
 			result = handler.execute(controllerClass, currentMessages);
 		}
 
+		handleResult(result);
+
 		if (isAtLastParameter()) {
 			clear();
 		}
-
-		handleResult(result);
 	}
 
 	private void handleResult(TgRequestResult result) {
