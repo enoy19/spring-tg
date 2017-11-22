@@ -47,9 +47,6 @@ public class TgMessageDispatcher {
 
 		handleResult(result);
 
-		if (isAtLastParameter()) {
-			clear();
-		}
 	}
 
 	private void handleResult(TgRequestResult result) {
@@ -59,6 +56,10 @@ public class TgMessageDispatcher {
 				break;
 			case ABORT:
 				clear();
+				break;
+			default:
+				if(isAtLastParameter())
+					clear();
 				break;
 		}
 	}
