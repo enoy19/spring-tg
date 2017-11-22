@@ -2,9 +2,9 @@
 Create Telegram Bot commands within Spring in a SpringMVC manner.
 This project uses [rubenlagus'](https://github.com/rubenlagus) [Java Telegram Bot API](https://github.com/rubenlagus/TelegramBots).
 
-##Examles
+## Examles
 
-#####Ping pong example:
+##### Ping pong example:
 ```java
 @TgController(name = "PingPong", description = "Sends back Pong", regex = "\\/ping") // describe an action
 public class PingPong {
@@ -20,7 +20,7 @@ public class PingPong {
 }
 ```
 
-#####Another Example with more than one argument:
+##### Another Example with more than one argument:
 ```java
 @TgController(name = "Add", description = "Add two numbers together", regex = "\\/add")
 public class AddAction {
@@ -40,7 +40,7 @@ public class AddAction {
 }
 ```
 
-#####You may also intercept between each argument:
+##### You may also intercept between each argument:
 ```java
 @TgController(name = "Add", description = "Add two numbers together", regex = "\\/add")
 public class AddAction {
@@ -73,7 +73,7 @@ public class AddAction {
 }
 ```
 
-#####Telegram User Scope: @Scope("tg"")
+##### Telegram User Scope: @Scope("tg"")
 ```java
 @TgController(name = "Concatenate", description = "Concatenate a string infinitely", regex = "\\/concat")
 @Scope("tg") // scoped only to one user
@@ -103,7 +103,7 @@ public class AddAction {
 }
 ```
 
-#####More Control
+##### More Control
 ```java
 @TgController(name = "Guess", description = "Guess a random number between 1-10", regex = "\\/guess") 
 @Scope("tg")
@@ -153,7 +153,7 @@ public class PingPong {
 }
 ```
 
-#####Any Telegram message data type
+##### Any Telegram message data type
 ```java
 @TgController(name = "Play Music", description = "Plays the given song", regex = "\\/play_music") 
 public class PingPong {
@@ -179,7 +179,7 @@ public class PingPong {
 }
 ```
 
-#####Resolving message data types
+##### Resolving message data types
 ```java
 @TgController(name = "Play Music", description = "Plays the given song", regex = "\\/play_music") 
 public class PingPong {
@@ -228,7 +228,7 @@ public class PingPong {
 }
 ```
 
-#####Custom logic for command validation (instead of regex)
+##### Custom logic for command validation (instead of regex)
 ```java
 // set a class for commandValidator to use a custom CommandValidator
 @TgController(name = "Save Image", description = "Saves an image to the disk", commandValidator = SaveImageCommandValidator.class ) 
