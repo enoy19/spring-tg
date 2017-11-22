@@ -75,6 +75,7 @@ public class TgMessageDispatcher {
 	private int getCurrentActionMaxParameterCount() {
 		OptionalInt optMaxParameterCount =
 				currentAction.getRequestHandlers().stream()
+						.filter(Objects::nonNull)
 						.mapToInt(TgActionRequestHandler::getParameterCount)
 						.max();
 
