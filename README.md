@@ -6,6 +6,24 @@ This project uses [rubenlagus'](https://github.com/rubenlagus) [Java implementat
 
 For an example spring boot project have a look at: [enoy19/spring-tg-examples](https://github.com/enoy19/spring-tg-examples)
 
+#### Spring Boot
+
+##### Enable spring-tg
+It is necessary to add "bot.token" and "bot.name" to a properties file (application.properties) 
+```java
+@SpringBootApplication
+@EnableTgBot // Just add this annotation to some configuration bean
+public class SpringBootTelegramBotApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootTelegramBotApplication.class, args);
+    }
+
+}
+```
+
+#### Commands/Actions
+
 ##### Ping pong example:
 ```java
 @TgController(name = "PingPong", description = "Sends back Pong", regex = "\\/ping") // describe an action
