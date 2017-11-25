@@ -167,7 +167,7 @@ public class PingPong {
     
     @TgRequest
     public void guess(String command, String guessString, String wish) {
-    	messageService.sendMessage("I am sorry but I can't make your with '" + wish + "' come true :(");
+    	messageService.sendMessage("I am sorry but I can't make your wish '" + wish + "' come true :(");
     }
 
 }
