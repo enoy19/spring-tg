@@ -33,37 +33,32 @@ public class TgBot extends TelegramLongPollingBot {
 	private String botUsername;
 
 	@Override
-	public void onUpdateReceived(final Update update) {
+	public synchronized void onUpdateReceived(final Update update) {
 		if (update.hasMessage()) {
 			final Message message = update.getMessage();
 
-			Integer senderUserId = message.getFrom().getId();
-			TgContext senderTgContext = TgContextHolder.getContextOfUserId(senderUserId);
+			Thread processThread = new Thread(() -> {
+				TgContextHolder.setupContext(message.getFrom());
+				TgContext tgContext = TgContextHolder.currentContext();
 
-			synchronized (senderTgContext) {
-				Thread processThread = new Thread(() -> {
-					TgContextHolder.setupContext(message.getFrom());
-					TgContext tgContext = TgContextHolder.currentContext();
-
-					synchronized (tgContext) {
-						TgMessageDispatcher dispatcher = context.getBean(TgMessageDispatcher.class);
-						try {
-							dispatcher.dispatch(message);
-						} catch (TgDispatchException e) {
-							sendPrefixed(tgContext.getUserId(), "ERROR", e.getMessage());
-							dispatcher.clear();
-							log.error(e.getMessage(), e);
-						} catch (Exception e) {
-							sendPrefixed(tgContext.getUserId(), "FATAL ERROR", "Something went wrong :(");
-							dispatcher.clear();
-							log.error(e.getMessage(), e);
-						}
+				synchronized (tgContext) {
+					TgMessageDispatcher dispatcher = context.getBean(TgMessageDispatcher.class);
+					try {
+						dispatcher.dispatch(message);
+					} catch (TgDispatchException e) {
+						sendPrefixed(tgContext.getUserId(), "ERROR", e.getMessage());
+						dispatcher.clear();
+						log.error(e.getMessage(), e);
+					} catch (Exception e) {
+						sendPrefixed(tgContext.getUserId(), "FATAL ERROR", "Something went wrong :(");
+						dispatcher.clear();
+						log.error(e.getMessage(), e);
 					}
+				}
 
-				});
-				processThread.setDaemon(true);
-				processThread.start();
-			}
+			});
+			processThread.setDaemon(true);
+			processThread.start();
 		}
 	}
 
