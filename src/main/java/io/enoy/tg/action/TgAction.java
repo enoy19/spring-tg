@@ -25,6 +25,8 @@ public final class TgAction {
 	private final String regex;
 	private final Class<? extends CommandValidator> commandValidatorClass;
 	private final List<TgActionRequestHandler> requestHandlers;
+	private final TgActionRequestHandler preAction;
+	private final TgActionRequestHandler postAction;
 
 	public boolean hasRegex() {
 		return Objects.nonNull(regex) && !regex.trim().isEmpty();

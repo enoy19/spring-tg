@@ -278,3 +278,30 @@ public class SaveImageCommandValidator implements CommandValidator {
 	
 }
 ```
+
+##### Pre and Post action methods
+
+```java
+@TgController(name = "PingPong", description = "Sends back Pong", regex = "\\/ping")
+public class PingPong {
+
+    @Autowired
+    private TgMessageService messageService;
+
+    @TgPreAction
+    public void pre(/*Params must be empty*/) {
+        messageService.sendMessage("Hello User, please prepare to be ponged!");
+    }
+
+    @TgRequest
+    public void pong(String command) {
+        messageService.sendMessage("Pong");
+    }
+    
+    @TgPostAction
+    public void post(/*Params must be empty*/) {
+        messageService.sendMessage("Thanks for being ponged, user <3");
+    }
+
+}
+```
