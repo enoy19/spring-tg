@@ -39,4 +39,7 @@ public final class TgAction {
 		return text.matches(regex);
 	}
 
+    public boolean isRegexExisting() {
+        return Objects.nonNull(regex) && !regex.trim().isEmpty();
+    }
 }

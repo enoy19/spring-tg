@@ -1,6 +1,7 @@
 package io.enoy.tg.bot;
 
 import io.enoy.tg.action.CommandValidator;
+import io.enoy.tg.action.MessageValidationValue;
 import io.enoy.tg.action.TgAction;
 import io.enoy.tg.action.TgActionRequestHandler;
 import io.enoy.tg.action.request.TgParameterType.NonMatchingTypeException;
@@ -166,16 +167,21 @@ public class TgMessageDispatcher {
 		return
 				actions.stream()
 						.filter(action -> {
+							MessageValidationValue commandValidatorValue = MessageValidationValue.NOT_EXISTING;
+							MessageValidationValue regexValue = MessageValidationValue.NOT_EXISTING;
+
 							if (action.isCommandValidatorExisting(message)) {
 								CommandValidator validator = getCommandValidator(action.getCommandValidatorClass());
-								return validator.validate(message);
-							} else {
+								commandValidatorValue = MessageValidationValue.valueFor(validator.validate(message));
+							}
+
+							if (action.isRegexExisting()) {
 								if (message.hasText() && action.hasRegex()) {
-									return action.isRegexMatching(message.getText());
+									regexValue = MessageValidationValue.valueFor(action.isRegexMatching(message.getText()));
 								}
 							}
 
-							return false;
+							return commandValidatorValue.chainValidity(regexValue).isValid();
 						}).collect(Collectors.toList());
 
 

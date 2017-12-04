@@ -24,7 +24,7 @@ public @interface TgController {
 	String description();
 
 	/**
-	 * @return the class of the validator of this method. This is processed before using the regex
+     * @return the class of the validator of this method. If a command validator and regex is present both must match!
 	 * @see CommandValidator
 	 */
 	Class<? extends CommandValidator> commandValidator() default NoCommandValidator.class;
@@ -32,7 +32,7 @@ public @interface TgController {
 	/**
 	 * the command is valid if the {@link TgController#commandValidator()} has {@link NoCommandValidator} the {@link io.enoy.tg.bot.TgMessageDispatcher},t
 	 * he given command has text ({@link Message#hasText()}) and the regex matches
-	 * @return if the given message text matches this regex. This controller is a valid candidate. Is only called when commandValidator is NoCommandValidator (default)
+     * @return if the given message text matches this regex. This controller is a valid candidate. If a command validator and regex is present both must match!
 	 */
 	String regex() default "";
 

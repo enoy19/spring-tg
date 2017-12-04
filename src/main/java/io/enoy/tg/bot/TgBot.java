@@ -24,69 +24,64 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 @Slf4j
 public class TgBot extends TelegramLongPollingBot {
 
-	private final ApplicationContext context;
+    private final ApplicationContext context;
 
-	@Value("${bot.token}")
-	private String botToken;
+    @Value("${bot.token}")
+    private String botToken;
 
-	@Value("${bot.name}")
-	private String botUsername;
+    @Value("${bot.name}")
+    private String botUsername;
 
-	@Override
-	public void onUpdateReceived(final Update update) {
-		if (update.hasMessage()) {
-			final Message message = update.getMessage();
+    @Override
+    public synchronized void onUpdateReceived(final Update update) {
+        if (update.hasMessage()) {
+            final Message message = update.getMessage();
 
-			Integer senderUserId = message.getFrom().getId();
-			TgContext senderTgContext = TgContextHolder.getContextOfUserId(senderUserId);
+            Thread processThread = new Thread(() -> {
+                TgContextHolder.setupContext(message.getFrom());
+                TgContext tgContext = TgContextHolder.currentContext();
 
-			synchronized (senderTgContext) {
-				Thread processThread = new Thread(() -> {
-					TgContextHolder.setupContext(message.getFrom());
-					TgContext tgContext = TgContextHolder.currentContext();
+                synchronized (tgContext) {
+                    TgMessageDispatcher dispatcher = context.getBean(TgMessageDispatcher.class);
+                    try {
+                        dispatcher.dispatch(message);
+                    } catch (TgDispatchException e) {
+                        sendPrefixed(tgContext.getUserId(), "ERROR", e.getMessage());
+                        dispatcher.clear();
+                        log.error(e.getMessage(), e);
+                    } catch (Exception e) {
+                        sendPrefixed(tgContext.getUserId(), "FATAL ERROR", "Something went wrong :(");
+                        dispatcher.clear();
+                        log.error(e.getMessage(), e);
+                    }
+                }
 
-					synchronized (tgContext) {
-						TgMessageDispatcher dispatcher = context.getBean(TgMessageDispatcher.class);
-						try {
-							dispatcher.dispatch(message);
-						} catch (TgDispatchException e) {
-							sendPrefixed(tgContext.getUserId(), "ERROR", e.getMessage());
-							dispatcher.clear();
-							log.error(e.getMessage(), e);
-						} catch (Exception e) {
-							sendPrefixed(tgContext.getUserId(), "FATAL ERROR", "Something went wrong :(");
-							dispatcher.clear();
-							log.error(e.getMessage(), e);
-						}
-					}
+            });
+            processThread.setDaemon(true);
+            processThread.start();
+        }
+    }
 
-				});
-				processThread.setDaemon(true);
-				processThread.start();
-			}
-		}
-	}
+    @Override
+    public String getBotUsername() {
+        return botUsername;
+    }
 
-	@Override
-	public String getBotUsername() {
-		return botUsername;
-	}
+    @Override
+    public String getBotToken() {
+        return botToken;
+    }
 
-	@Override
-	public String getBotToken() {
-		return botToken;
-	}
+    private void sendPrefixed(long userId, String prefix, String message) {
+        send(userId, String.format("%s:%n%s", prefix, message));
+    }
 
-	private void sendPrefixed(long userId, String prefix, String message) {
-		send(userId, String.format("%s:%n%s", prefix, message));
-	}
-
-	private void send(long userId, String message) {
-		try {
-			execute(new SendMessage(userId, message));
-		} catch (TelegramApiException e1) {
-			throw new IllegalStateException(e1);
-		}
-	}
+    private void send(long userId, String message) {
+        try {
+            execute(new SendMessage(userId, message));
+        } catch (TelegramApiException e1) {
+            throw new IllegalStateException(e1);
+        }
+    }
 
 }
