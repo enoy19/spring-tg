@@ -9,6 +9,7 @@ import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
@@ -121,6 +122,13 @@ public class TgMessageServiceContextless {
         SendMessage sendMessage = new SendMessage(chatId, message);
         sendMessage.setReplyMarkup(keyboard);
 
+        return execute(sendMessage);
+    }
+
+    public Message removeKeyboard(long chatId) {
+        ReplyKeyboardRemove removeMarkup = new ReplyKeyboardRemove();
+        SendMessage sendMessage = new SendMessage(chatId, "");
+        sendMessage.setReplyMarkup(removeMarkup);
         return execute(sendMessage);
     }
 
