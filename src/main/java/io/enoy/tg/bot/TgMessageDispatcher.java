@@ -1,9 +1,9 @@
 package io.enoy.tg.bot;
 
 import io.enoy.tg.action.CommandValidator;
-import io.enoy.tg.action.MessageValidationValue;
 import io.enoy.tg.action.TgAction;
 import io.enoy.tg.action.TgActionRequestHandler;
+import io.enoy.tg.action.ValidType;
 import io.enoy.tg.action.request.TgParameterType.NonMatchingTypeException;
 import io.enoy.tg.action.request.TgRequestHandlerHopsComposition;
 import io.enoy.tg.action.request.TgRequestResult;
@@ -167,21 +167,21 @@ public class TgMessageDispatcher {
 		return
 				actions.stream()
 						.filter(action -> {
-							MessageValidationValue commandValidatorValue = MessageValidationValue.NOT_EXISTING;
-							MessageValidationValue regexValue = MessageValidationValue.NOT_EXISTING;
+							ValidType commandValidatorVType = ValidType.NOT_EXISTING;
+							ValidType regexVType = ValidType.NOT_EXISTING;
 
 							if (action.isCommandValidatorExisting(message)) {
 								CommandValidator validator = getCommandValidator(action.getCommandValidatorClass());
-								commandValidatorValue = MessageValidationValue.valueFor(validator.validate(message));
+								commandValidatorVType = ValidType.fromBoolean(validator.validate(message));
 							}
 
 							if (action.isRegexExisting()) {
 								if (message.hasText() && action.hasRegex()) {
-									regexValue = MessageValidationValue.valueFor(action.isRegexMatching(message.getText()));
+									regexVType = ValidType.fromBoolean(action.isRegexMatching(message.getText()));
 								}
 							}
 
-							return commandValidatorValue.chainValidity(regexValue).isValid();
+							return commandValidatorVType.chainType(regexVType).isValid();
 						}).collect(Collectors.toList());
 
 
