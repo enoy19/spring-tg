@@ -58,6 +58,13 @@ public class TgMessageService {
         return messageServiceContextless.sendReplyKeyboard(getCurrentUserId(), message, keyboardText, oneTimeKeyboard);
     }
 
+    /**
+     * @see TgMessageServiceContextless#removeKeyboard(long)
+     */
+    public void removeKeyboard() {
+        messageServiceContextless.removeKeyboard(getCurrentUserId());
+    }
+
     private long getCurrentUserId() {
         return TgContextHolder.currentContext().getUserId();
     }

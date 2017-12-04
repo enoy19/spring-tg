@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -125,11 +126,14 @@ public class TgMessageServiceContextless {
         return execute(sendMessage);
     }
 
-    public Message removeKeyboard(long chatId) {
+    public void removeKeyboard(long chatId) {
         ReplyKeyboardRemove removeMarkup = new ReplyKeyboardRemove();
-        SendMessage sendMessage = new SendMessage(chatId, "");
+        SendMessage sendMessage = new SendMessage(chatId, "This message was sent to remove the keyboard.");
         sendMessage.setReplyMarkup(removeMarkup);
-        return execute(sendMessage);
+        Message message = execute(sendMessage);
+
+        DeleteMessage deleteMessage = new DeleteMessage(chatId, message.getMessageId());
+        execute(deleteMessage);
     }
 
     /**
