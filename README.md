@@ -305,3 +305,54 @@ public class PingPong {
 
 }
 ```
+
+#### Spring Security
+
+##### Restrict methods
+
+```java
+@TgController(name = "Admin Action", description = "This action can only be used by admins", regex = "\\/admin")
+@RequiredArgsConstructor
+public class AdminAction {
+
+	private final TgMessageService messageService;
+
+	@TgRequest
+	@PreAuthorize("hasRole('ROLE_ADMIN')") // Use spring method security
+	public void admin(String command) {
+		messageService.sendMessage("You are an admin!");
+	}
+
+}
+```
+
+##### Define Granted Authorities Provider
+
+```java
+@Component
+@RequiredArgsConstructor
+public class MyTgGrantedAuthoritiesProvider implements TgGrantedAuthoritiesProvider {
+
+    /**
+    * Very simple example. User with the username "ThisIsTheAdminUserName"
+    * gets the admin role. Is a user.
+    */
+	@Override
+	public Collection<GrantedAuthority> getAuthoritiesOf(TgContext tgContext) {
+		List<GrantedAuthority> authorities = new ArrayList<>();
+
+        if(tgContext.getUser().getUserName().equals("ThisIsTheAdminUserName")) {
+			authorities.add(getAuthorityInstance("ADMIN"));
+		}
+
+		authorities.add(getAuthorityInstance("USER"));
+
+		return authorities;
+	}
+
+	private static GrantedAuthority getAuthorityInstance(String role) {
+		return new SimpleGrantedAuthority(String.format("ROLE_%s", role));
+	}
+
+}
+```
