@@ -4,20 +4,13 @@ import io.enoy.tg.action.request.TgParameterType;
 import io.enoy.tg.action.request.TgRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -31,34 +24,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class TgActionRegisterer {
 
-    private static final String TG_ACTION_BEAN_SUFFIX = "$tgAction";
-    private final ApplicationContext context;
-    private final ConfigurableBeanFactory beanFactory;
-
-    @PostConstruct
-    private void init() {
-        log.info("[REGISTERING] TgActions...");
-        Set<BeanDefinition> tgControllerDefinition = seekControllers();
-        List<Object> controllers = getControllers(tgControllerDefinition);
-        registerActions(controllers);
-        log.info("[REGISTERING DONE] {} TgAction/s", controllers.size());
-    }
-
-    private void registerActions(List<Object> controllers) {
-        for (Object controller : controllers) {
-            String controllerClassName = controller.getClass().getName();
-            log.info(" - [REGISTERING] TgController: {}", controllerClassName);
-
-            TgAction tgAction = registerAction(controller);
-            String beanName = controllerClassName + TG_ACTION_BEAN_SUFFIX;
-            beanFactory.registerSingleton(beanName, tgAction);
-
-            log.info(" - [REGISTERING DONE] TgController: {} ({})", controllerClassName, beanName);
-        }
-    }
-
-    private TgAction registerAction(Object controller) {
-        List<Method> thMethods = getTgRequestMethods(controller);
+	public TgAction registerAction(Object controller) {
+		List<Method> thMethods = getTgRequestMethods(controller);
 
         TgController tgController = getTgController(controller);
         List<TgActionRequestHandler> requestHandlers = createTgActionRequestHandlers(thMethods);
@@ -192,32 +159,11 @@ public final class TgActionRegisterer {
         List<Method> methods = new ArrayList<>();
 
         Class<?> controllerClass = controller.getClass();
-        for (Method method : controllerClass.getMethods())
-            if (method.isAnnotationPresent(annotation))
+	    for (Method method : controllerClass.getDeclaredMethods())
+		    if (method.isAnnotationPresent(annotation))
                 methods.add(method);
 
         return methods;
-    }
-
-    private List<Object> getControllers(Set<BeanDefinition> candidateComponents) {
-        List<Object> controllers = new ArrayList<>();
-
-        for (BeanDefinition beanDefinition : candidateComponents) {
-            try {
-                Object controller = context.getBean(Class.forName(beanDefinition.getBeanClassName()));
-                controllers.add(controller);
-            } catch (ClassNotFoundException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-
-        return controllers;
-    }
-
-    private Set<BeanDefinition> seekControllers() {
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(TgController.class));
-        return scanner.findCandidateComponents("");
     }
 
 }
