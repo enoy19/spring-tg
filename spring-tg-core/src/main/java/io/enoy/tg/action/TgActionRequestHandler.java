@@ -7,12 +7,10 @@ import io.enoy.tg.action.request.TgRequestResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.access.AccessDeniedException;
 import org.telegram.telegrambots.api.objects.Message;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * contains data of {@link io.enoy.tg.action.request.TgRequest}s in {@link TgController}s ({@link TgAction})
@@ -47,10 +45,7 @@ public final class TgActionRequestHandler {
 				return (TgRequestResult) result;
 			}
 		} catch (ReflectiveOperationException e) {
-			if (Objects.nonNull(e.getCause()) && e.getCause() instanceof AccessDeniedException)
-				throw (AccessDeniedException) e.getCause();
-
-			throw new IllegalStateException(e);
+			throw new TgActionRequestHandlerException(e);
 		}
 
 		return TgRequestResult.OK;

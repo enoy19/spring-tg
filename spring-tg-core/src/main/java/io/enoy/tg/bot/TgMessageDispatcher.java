@@ -114,13 +114,13 @@ public class TgMessageDispatcher {
     }
 
     private int getCurrentActionMaxParameterCount() {
-        OptionalInt optMaxParameterCount =
-                currentAction.getRequestHandlers().stream()
-                        .filter(Objects::nonNull)
-                        .mapToInt(TgActionRequestHandler::getParameterCount)
-                        .max();
+	    OptionalInt maxParameterCountOptional =
+			    currentAction.getRequestHandlers().stream()
+					    .filter(Objects::nonNull)
+					    .mapToInt(TgActionRequestHandler::getParameterCount)
+					    .max();
 
-        return optMaxParameterCount.isPresent() ? optMaxParameterCount.getAsInt() : -1;
+	    return maxParameterCountOptional.isPresent() ? maxParameterCountOptional.getAsInt() : -1;
     }
 
     private TgActionRequestHandler resolveHandler() throws TgDispatchException {

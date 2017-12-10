@@ -9,25 +9,36 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
+	<packaging>jar</packaging>
+
 	<artifactId>spring-tg-examples</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.enoy</groupId>
+			<artifactId>spring-tg-security</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>io.enoy</groupId>
 			<artifactId>spring-tg-core</artifactId>
 		</dependency>
+
 	</dependencies>
 
 </project>
