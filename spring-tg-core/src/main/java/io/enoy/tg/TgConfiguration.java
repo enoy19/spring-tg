@@ -26,7 +26,7 @@ public class TgConfiguration {
 	 * @return TgBot bean
 	 */
 	@Bean
-	public TgBot tradeBot() {
+	public TgBot tgBot() {
 		ApiContextInitializer.init();
 		return new TgBot(context);
 	}

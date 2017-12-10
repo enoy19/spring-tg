@@ -6,6 +6,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class TgSecurityConfiguration {
 }

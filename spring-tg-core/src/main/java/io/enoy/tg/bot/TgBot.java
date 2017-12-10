@@ -13,6 +13,8 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+import java.util.Objects;
+
 /**
  * A {@link TelegramLongPollingBot} that takes care of creating request Threads, setting up the {@link TgContext} as well as forwarding the message to the {@link TgMessageDispatcher}
  *
@@ -68,13 +70,22 @@ public class TgBot extends TelegramLongPollingBot {
 
 	private void handleException(TgContext tgContext, Exception e) {
 		TgExceptionDispatcher exceptionDispatcher = context.getBean(TgExceptionDispatcher.class);
-		boolean sucessfullyDispatched = exceptionDispatcher.dispatchException(e);
+
+		Throwable rootCause = getRootCause(e);
+		boolean sucessfullyDispatched = exceptionDispatcher.dispatchException(rootCause);
 
 		if (!sucessfullyDispatched) {
 			log.error("Unhandled exception");
 			log.error(e.getMessage(), e);
 			send(tgContext.getChatId(), "Fatal Error\nSomething went wrong :(");
 		}
+	}
+
+	private Throwable getRootCause(Throwable throwable) {
+		if (Objects.nonNull(throwable.getCause()))
+			getRootCause(throwable.getCause());
+
+		return throwable;
 	}
 
 	@Override

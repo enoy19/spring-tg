@@ -20,7 +20,7 @@ public class TgSecurityAspect {
 
 	private final Optional<TgGrantedAuthoritiesProvider> tgGrantedAuthoritiesProviderOptional;
 
-	@Before("execution(* io.enoy.tg.bot.TgBot.dispatchMessage(org.telegram.telegrambots.api.objects.Message, io.enoy.tg.scope.context.TgContext))")
+	@Before("execution(* io.enoy.tg.bot.TgBot.dispatchMessage(*))")
 	public void setupSecurityContext(JoinPoint joinPoint) {
 		TgContext tgContext = (TgContext) joinPoint.getArgs()[1];
 
