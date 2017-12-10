@@ -1,6 +1,7 @@
 package io.enoy.tg;
 
 import io.enoy.tg.bot.TgBot;
+import io.enoy.tg.bot.TgBotMessageHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ import org.telegram.telegrambots.TelegramBotsApi;
 @RequiredArgsConstructor
 public class TgConfiguration {
 
-	private final ApplicationContext context;
+	private final TgBotMessageHandler messageHandler;
 
 	/**
 	 * initializes the central telegram bot using the wonderful {@link ApiContextInitializer}.
@@ -28,7 +29,7 @@ public class TgConfiguration {
 	@Bean
 	public TgBot tgBot() {
 		ApiContextInitializer.init();
-		return new TgBot(context);
+		return new TgBot(messageHandler);
 	}
 
 	@Bean

@@ -37,7 +37,7 @@ public final class TgExceptionDispatcher {
 						.findFirst();
 
 		if (handlerOptional.isPresent()) {
-			handlerOptional.get().accepts(e);
+			handlerOptional.get().handle(e);
 			return true;
 		}
 

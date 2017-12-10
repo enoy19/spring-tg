@@ -1,6 +1,6 @@
 package io.enoy.tg.bot;
 
-import io.enoy.tg.bot.exceptions.TgExceptionDispatcher;
+import io.enoy.tg.bot.TgBotMessageHandler.TgBotMessageHandleException;
 import io.enoy.tg.scope.context.TgContext;
 import io.enoy.tg.scope.context.TgContextHolder;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,6 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import java.util.Objects;
-
 /**
  * A {@link TelegramLongPollingBot} that takes care of creating request Threads, setting up the {@link TgContext} as well as forwarding the message to the {@link TgMessageDispatcher}
  *
@@ -24,9 +22,9 @@ import java.util.Objects;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class TgBot extends TelegramLongPollingBot {
+public final class TgBot extends TelegramLongPollingBot {
 
-	private final ApplicationContext context;
+	private final TgBotMessageHandler messageHandler;
 
 	@Value("${bot.token}")
 	private String botToken;
@@ -40,52 +38,21 @@ public class TgBot extends TelegramLongPollingBot {
 			final Message message = update.getMessage();
 
 			Thread processThread = new Thread(() -> {
-				handleMessage(message);
+				TgContextHolder.setupContext(message);
+				TgContext tgContext = TgContextHolder.currentContext();
+
+				synchronized (tgContext) {
+					try {
+						messageHandler.handleMessage(message, tgContext);
+					}catch (TgBotMessageHandleException e) {
+						send(tgContext.getChatId(), e.getMessage());
+					}
+				}
 			});
 			processThread.setName("TgRequest");
 			processThread.setDaemon(true);
 			processThread.start();
 		}
-	}
-
-	private void handleMessage(Message message) {
-		TgContextHolder.setupContext(message);
-		TgContext tgContext = TgContextHolder.currentContext();
-
-		synchronized (tgContext) {
-			dispatchMessage(message, tgContext);
-		}
-	}
-
-	public void dispatchMessage(Message message, TgContext tgContext) {
-		TgMessageDispatcher messageDispatcher = context.getBean(TgMessageDispatcher.class);
-
-		try {
-			messageDispatcher.dispatch(message);
-		} catch (Exception e) {
-			messageDispatcher.clear();
-			handleException(tgContext, e);
-		}
-	}
-
-	private void handleException(TgContext tgContext, Exception e) {
-		TgExceptionDispatcher exceptionDispatcher = context.getBean(TgExceptionDispatcher.class);
-
-		Throwable rootCause = getRootCause(e);
-		boolean sucessfullyDispatched = exceptionDispatcher.dispatchException(rootCause);
-
-		if (!sucessfullyDispatched) {
-			log.error("Unhandled exception");
-			log.error(e.getMessage(), e);
-			send(tgContext.getChatId(), "Fatal Error\nSomething went wrong :(");
-		}
-	}
-
-	private Throwable getRootCause(Throwable throwable) {
-		if (Objects.nonNull(throwable.getCause()))
-			getRootCause(throwable.getCause());
-
-		return throwable;
 	}
 
 	@Override
