@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Registers the {@link TgScope} in the {@link org.springframework.beans.factory.BeanFactory}
- * @author
+ * @author Enis Ö.
  * @see TgScope
  */
 @Component
