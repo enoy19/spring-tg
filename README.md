@@ -4,7 +4,7 @@ This project uses [rubenlagus'](https://github.com/rubenlagus) [Java implementat
 
 ## Examples
 
-For an example spring boot project have a look at: [enoy19/spring-tg-examples](https://github.com/enoy19/spring-tg-examples)
+You can find practical examples in the "spring-tg-examples" module
 
 #### Spring Boot
 

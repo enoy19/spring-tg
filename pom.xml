@@ -7,7 +7,12 @@
 	<groupId>io.enoy</groupId>
 	<artifactId>spring-tg</artifactId>
 	<version>1.0.3</version>
-	<packaging>jar</packaging>
+
+	<modules>
+		<module>spring-tg-core</module>
+		<module>spring-tg-examples</module>
+	</modules>
+	<packaging>pom</packaging>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -16,34 +21,7 @@
 		<spring-boot-dependencies.version>1.5.7.RELEASE</spring-boot-dependencies.version>
 	</properties>
 
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
-	</build>
-
 	<dependencies>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots</artifactId>
-			<version>${telegrambots.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -54,7 +32,6 @@
 	</dependencies>
 
 	<dependencyManagement>
-
 		<dependencies>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -63,8 +40,19 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-		</dependencies>
 
+			<dependency>
+				<groupId>org.telegram</groupId>
+				<artifactId>telegrambots</artifactId>
+				<version>${telegrambots.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.enoy</groupId>
+				<artifactId>spring-tg-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
 	</dependencyManagement>
 
 </project>
