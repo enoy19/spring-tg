@@ -66,7 +66,7 @@ public class TgMessageService {
     }
 
     private long getCurrentChatId() {
-        return TgContextHolder.currentContext().getUserId();
+        return TgContextHolder.currentContext().getChatId();
     }
 
 
