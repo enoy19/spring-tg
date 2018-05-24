@@ -31,202 +31,202 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TgMessageDispatcher {
 
-    private final ApplicationContext context;
-    private final Set<TgAction> actions;
-    private final List<Message> currentMessages = new ArrayList<>();
-    private TgAction currentAction;
+	private final ApplicationContext context;
+	private final Set<TgAction> actions;
+	private final List<Message> currentMessages = new ArrayList<>();
+	private TgAction currentAction;
 
-    public void dispatch(Message message) throws TgDispatchException {
+	public void dispatch(Message message) throws TgDispatchException {
 
-        Object controllerClass = getControllerClass();
+		Object controllerClass = getControllerClass();
 
-        if (Objects.isNull(currentAction)) {
-            currentAction = resolveAction(message);
-            // current action was null. must get controller class again
-            controllerClass = getControllerClass();
-            handlePreAction(controllerClass);
-        }
+		if (Objects.isNull(currentAction)) {
+			currentAction = resolveAction(message);
+			// current action was null. must get controller class again
+			controllerClass = getControllerClass();
+			handlePreAction(controllerClass);
+		}
 
-        currentMessages.add(message);
+		currentMessages.add(message);
 
-        TgActionRequestHandler handler = resolveHandler();
+		TgActionRequestHandler handler = resolveHandler();
 
-        TgRequestResult result = TgRequestResult.OK;
+		TgRequestResult result = TgRequestResult.OK;
 
-        if (Objects.nonNull(handler)) {
-            result = handler.execute(controllerClass, currentMessages);
-        }
+		if (Objects.nonNull(handler)) {
+			result = handler.execute(controllerClass, currentMessages);
+		}
 
-        boolean done = handleResult(result);
+		boolean done = handleResult(result);
 
-        if (done) {
-            handlePostAction(controllerClass);
-            clear();
-        }
+		if (done) {
+			handlePostAction(controllerClass);
+			clear();
+		}
 
-    }
+	}
 
-    private Object getControllerClass() {
-        if (Objects.isNull(currentAction))
-            return null;
-        return context.getBean(currentAction.getControllerClass());
-    }
+	private Object getControllerClass() {
+		if (Objects.isNull(currentAction))
+			return null;
+		return context.getBean(currentAction.getControllerClass());
+	}
 
-    private void handlePreAction(Object controllerClass) {
-        if (Objects.nonNull(currentAction.getPreAction()))
-            currentAction.getPreAction().execute(controllerClass, Collections.emptyList());
-    }
+	private void handlePreAction(Object controllerClass) {
+		if (Objects.nonNull(currentAction.getPreAction()))
+			currentAction.getPreAction().execute(controllerClass, Collections.emptyList());
+	}
 
-    private void handlePostAction(Object controllerClass) {
-        if (Objects.nonNull(currentAction.getPostAction()))
-            currentAction.getPostAction().execute(controllerClass, Collections.emptyList());
-    }
+	private void handlePostAction(Object controllerClass) {
+		if (Objects.nonNull(currentAction.getPostAction()))
+			currentAction.getPostAction().execute(controllerClass, Collections.emptyList());
+	}
 
-    /**
-     * handles result. clears arguments and current action on done or abort. steps arguments back on retry.
-     *
-     * @param result
-     * @return true if the action is done. false if it is still running
-     */
-    private boolean handleResult(TgRequestResult result) {
-        switch (result) {
-            case RETRY:
-                currentMessages.remove(currentMessages.size() - 1);
-                break;
-            case ABORT:
-                return true;
-            default:
-                if (isAtLastParameter())
-                    return true;
-                break;
-        }
+	/**
+	 * handles result. clears arguments and current action on done or abort. steps arguments back on retry.
+	 *
+	 * @param result
+	 * @return true if the action is done. false if it is still running
+	 */
+	private boolean handleResult(TgRequestResult result) {
+		switch (result) {
+			case RETRY:
+				currentMessages.remove(currentMessages.size() - 1);
+				break;
+			case ABORT:
+				return true;
+			default:
+				if (isAtLastParameter())
+					return true;
+				break;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public void clear() {
-        currentMessages.clear();
-        currentAction = null;
-    }
+	public void clear() {
+		currentMessages.clear();
+		currentAction = null;
+	}
 
-    private boolean isAtLastParameter() {
-        return currentMessages.size() >= getCurrentActionMaxParameterCount();
-    }
+	private boolean isAtLastParameter() {
+		return currentMessages.size() >= getCurrentActionMaxParameterCount();
+	}
 
-    private int getCurrentActionMaxParameterCount() {
-	    OptionalInt maxParameterCountOptional =
-			    currentAction.getRequestHandlers().stream()
-					    .filter(Objects::nonNull)
-					    .mapToInt(TgActionRequestHandler::getParameterCount)
-					    .max();
+	private int getCurrentActionMaxParameterCount() {
+		OptionalInt maxParameterCountOptional =
+				currentAction.getRequestHandlers().stream()
+						.filter(Objects::nonNull)
+						.mapToInt(TgActionRequestHandler::getParameterCount)
+						.max();
 
-	    return maxParameterCountOptional.isPresent() ? maxParameterCountOptional.getAsInt() : -1;
-    }
+		return maxParameterCountOptional.orElse(-1);
+	}
 
-    private TgActionRequestHandler resolveHandler() throws TgDispatchException {
-        checkHandlers();
+	private TgActionRequestHandler resolveHandler() throws TgDispatchException {
+		checkHandlers();
 
-        List<TgRequestHandlerHopsComposition> requestHandlersWithHops = getTgRequestHandlerWithHops();
+		List<TgRequestHandlerHopsComposition> requestHandlersWithHops = getTgRequestHandlerWithHops();
 
-        if (requestHandlersWithHops.isEmpty())
-            return null;
+		if (requestHandlersWithHops.isEmpty())
+			return null;
 
-        return getMinimalHopHandler(requestHandlersWithHops);
+		return getMinimalHopHandler(requestHandlersWithHops);
 
-    }
+	}
 
-    private List<TgRequestHandlerHopsComposition> getTgRequestHandlerWithHops() {
-        return currentAction.getRequestHandlers().stream()
-                .filter(tgActionRequestHandler -> tgActionRequestHandler.getParameterCount() == currentMessages.size())
-                .map(tgActionRequestHandler -> {
-                    try {
-                        return tgActionRequestHandler.getHops(currentMessages);
-                    } catch (NonMatchingTypeException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .sorted()
-                .collect(Collectors.toList());
-    }
+	private List<TgRequestHandlerHopsComposition> getTgRequestHandlerWithHops() {
+		return currentAction.getRequestHandlers().stream()
+				.filter(tgActionRequestHandler -> tgActionRequestHandler.getParameterCount() == currentMessages.size())
+				.map(tgActionRequestHandler -> {
+					try {
+						return tgActionRequestHandler.getHops(currentMessages);
+					} catch (NonMatchingTypeException e) {
+						return null;
+					}
+				})
+				.filter(Objects::nonNull)
+				.sorted()
+				.collect(Collectors.toList());
+	}
 
-    private TgActionRequestHandler getMinimalHopHandler(List<TgRequestHandlerHopsComposition> requestHandlersWithHops) throws TgDispatchException {
-        int mostHops = requestHandlersWithHops.stream()
-                .mapToInt(TgRequestHandlerHopsComposition::getHops)
-                .max()
-                .orElseGet(() -> {
-                    throw new Error("could not gather maximum hop amount. This should never happen wtf...");
-                });
+	private TgActionRequestHandler getMinimalHopHandler(List<TgRequestHandlerHopsComposition> requestHandlersWithHops) throws TgDispatchException {
+		int mostHops = requestHandlersWithHops.stream()
+				.mapToInt(TgRequestHandlerHopsComposition::getHops)
+				.max()
+				.orElseGet(() -> {
+					throw new Error("could not gather maximum hop amount. This should never happen wtf...");
+				});
 
-        for (int i = 0; i <= mostHops; i++) {
-            int finalI = i;
-            List<TgRequestHandlerHopsComposition> minHopsHandlers =
-                    requestHandlersWithHops.stream()
-                            .filter(tgRequestHandlerHopsComposition -> tgRequestHandlerHopsComposition.getHops() == finalI)
-                            .collect(Collectors.toList());
+		for (int i = 0; i <= mostHops; i++) {
+			int finalI = i;
+			List<TgRequestHandlerHopsComposition> minHopsHandlers =
+					requestHandlersWithHops.stream()
+							.filter(tgRequestHandlerHopsComposition -> tgRequestHandlerHopsComposition.getHops() == finalI)
+							.collect(Collectors.toList());
 
-            if (minHopsHandlers.size() > 1) {
-                throw new TgDispatchException("Multiple handlers found!");
-            } else if (minHopsHandlers.size() == 1) {
-                return minHopsHandlers.get(0).getHandler();
-            }
-        }
-        return null;
-    }
+			if (minHopsHandlers.size() > 1) {
+				throw new TgDispatchException("Multiple handlers found!");
+			} else if (minHopsHandlers.size() == 1) {
+				return minHopsHandlers.get(0).getHandler();
+			}
+		}
+		return null;
+	}
 
-    private void checkHandlers() throws TgDispatchException {
-        if (currentAction.getRequestHandlers().isEmpty())
-            throw new TgDispatchException("No handlers are defined!");
-    }
+	private void checkHandlers() throws TgDispatchException {
+		if (currentAction.getRequestHandlers().isEmpty())
+			throw new TgDispatchException("No handlers are defined!");
+	}
 
-    private TgAction resolveAction(Message message) throws TgDispatchException {
-        List<TgAction> matchingActions = findMatchingActions(message);
-        if (matchingActions.size() > 1) {
-            log.error("Multiple matching commands found: {}", getCommandNamesJoined(matchingActions));
-            throw new TgDispatchException("Multiple matching commands found!");
-        } else if (matchingActions.size() == 0) {
-            throw new TgDispatchException("Command not found");
-        } else {
-            return matchingActions.get(0);
-        }
-    }
+	private TgAction resolveAction(Message message) throws TgDispatchException {
+		List<TgAction> matchingActions = findMatchingActions(message);
+		if (matchingActions.size() > 1) {
+			log.error("Multiple matching commands found: {}", getCommandNamesJoined(matchingActions));
+			throw new TgDispatchException("Multiple matching commands found!");
+		} else if (matchingActions.size() == 0) {
+			throw new TgDispatchException("Command not found");
+		} else {
+			return matchingActions.get(0);
+		}
+	}
 
-    private String getCommandNamesJoined(List<TgAction> matchingActions) {
-        return matchingActions.stream().map(TgAction::getName).collect(Collectors.joining(", "));
-    }
+	private String getCommandNamesJoined(List<TgAction> matchingActions) {
+		return matchingActions.stream().map(TgAction::getName).collect(Collectors.joining(", "));
+	}
 
-    private List<TgAction> findMatchingActions(final Message message) {
-        return
-                actions.stream()
-                        .filter(action -> {
-                            ValidType commandValidatorVType = ValidType.NOT_EXISTING;
-                            ValidType regexVType = ValidType.NOT_EXISTING;
+	private List<TgAction> findMatchingActions(final Message message) {
+		return
+				actions.stream()
+						.filter(action -> {
+							ValidType commandValidatorVType = ValidType.NOT_EXISTING;
+							ValidType regexVType = ValidType.NOT_EXISTING;
 
-                            if (action.isCommandValidatorExisting(message)) {
-                                CommandValidator validator = getCommandValidator(action.getCommandValidatorClass());
-                                commandValidatorVType = ValidType.fromBoolean(validator.validate(message));
-                            }
+							if (action.isCommandValidatorExisting(message)) {
+								CommandValidator validator = getCommandValidator(action.getCommandValidatorClass());
+								commandValidatorVType = ValidType.fromBoolean(validator.validate(message));
+							}
 
-                            if (action.isRegexExisting()) {
-                                if (message.hasText() && action.hasRegex()) {
-                                    regexVType = ValidType.fromBoolean(action.isRegexMatching(message.getText()));
-                                }
-                            }
+							if (action.isRegexExisting()) {
+								if (message.hasText() && action.hasRegex()) {
+									regexVType = ValidType.fromBoolean(action.isRegexMatching(message.getText()));
+								}
+							}
 
-                            return commandValidatorVType.chainType(regexVType).isValid();
-                        }).collect(Collectors.toList());
+							return commandValidatorVType.chainType(regexVType).isValid();
+						}).collect(Collectors.toList());
 
 
-    }
+	}
 
-    private CommandValidator getCommandValidator(Class<? extends CommandValidator> commandValidatorClass) {
-        return context.getBean(commandValidatorClass);
-    }
+	private CommandValidator getCommandValidator(Class<? extends CommandValidator> commandValidatorClass) {
+		return context.getBean(commandValidatorClass);
+	}
 
-    public static class TgDispatchException extends Exception {
-        public TgDispatchException(String message) {
-            super(message);
-        }
-    }
+	public static class TgDispatchException extends Exception {
+		public TgDispatchException(String message) {
+			super(message);
+		}
+	}
 
 }
